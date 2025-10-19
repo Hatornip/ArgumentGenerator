@@ -1,134 +1,621 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>ABA Generator</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ABA Framework Generator</title>
     <style>
-        /* Styling for readability and usability */
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        textarea { width: 100%; height: 200px; }
+        :root {
+            --primary: #4a6fa5;
+            --primary-dark: #166088;
+            --primary-light: #4fc3f7;
+            --secondary: #f8f9fa;
+            --success: #4caf50;
+            --warning: #ff9800;
+            --danger: #f44336;
+            --info: #2196f3;
+            --light: #fdfdfd;
+            --dark: #343a40;
+            --border-radius: 4px;
+            --box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background-color: var(--light);
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1, h2, h3, h4 {
+            color: var(--primary-dark);
+            margin-bottom: 15px;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+        .card {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: var(--transition);
+        }
+        .card:hover {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        textarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            resize: vertical;
+            transition: var(--transition);
+        }
+        textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(74, 111, 165, 0.2);
+            outline: none;
+        }
         button {
-            padding: 10px 15px;
-            background: #007BFF;
+            background-color: var(--primary);
             color: white;
             border: none;
-            border-radius: 4px;
+            padding: 12px 20px;
+            border-radius: var(--border-radius);
             cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: var(--transition);
+            display: block;
+            margin: 20px auto;
         }
-        button:hover { background: #0056b3; }
-        #output { margin-top: 20px; }
+        button:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        #output {
+            margin-top: 30px;
+        }
         .section {
-            margin-bottom: 30px;
-            border: 1px solid #ddd;
-            padding: 15px;
-            border-radius: 4px;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 20px;
+            margin-bottom: 20px;
         }
-        pre {
-            background: #f4f4f4;
+        .section h2 {
+            color: var(--primary);
+            border-bottom: 2px solid var(--primary-light);
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .result-card {
+            background: var(--secondary);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            border-left: 4px solid var(--primary);
+        }
+        .result-card h3 {
+            margin-top: 0;
+            color: var(--primary-dark);
+        }
+        .result-card pre {
+            background: white;
             padding: 10px;
-            border-radius: 4px;
+            border-radius: var(--border-radius);
+            border: 1px solid #eee;
             overflow-x: auto;
+            font-size: 14px;
+        }
+        .tab {
+            overflow: hidden;
+            border: 1px solid #ddd;
+            background-color: #f1f1f1;
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+        }
+        .tab button {
+            background-color: inherit;
+            float: left;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 14px 16px;
+            transition: 0.3s;
+            font-size: 16px;
+            color: var(--dark);
+            display: block;
+            margin: 0;
+            border-radius: var(--border-radius);
+        }
+        .tab button:hover {
+            background-color: #ddd;
+            transform: none;
+        }
+        .tab button.active {
+            background-color: var(--primary);
+            color: white;
+        }
+        .tabcontent {
+            display: none;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-top: none;
+            border-radius: 0 0 var(--border-radius) var(--border-radius);
+            background: white;
+        }
+        .tabcontent.active {
+            display: block;
+        }
+        .attack-item {
+            background: white;
+            border: 1px solid #eee;
+            border-radius: var(--border-radius);
+            padding: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .attack-item.normal {
+            border-left: 4px solid var(--success);
+        }
+        .attack-item.reverse {
+            border-left: 4px solid var(--danger);
+        }
+        .attack-type {
+            font-weight: bold;
+            padding: 2px 8px;
+            border-radius: var(--border-radius);
+            font-size: 12px;
+        }
+        .attack-type.normal {
+            background: rgba(76, 175, 80, 0.2);
+            color: var(--success);
+        }
+        .attack-type.reverse {
+            background: rgba(244, 67, 54, 0.2);
+            color: var(--danger);
+        }
+        .argument-item {
+            background: white;
+            border: 1px solid #eee;
+            border-radius: var(--border-radius);
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .argument-item h4 {
+            margin-top: 0;
+            color: var(--primary);
+        }
+        .argument-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .detail-item {
+            background: var(--secondary);
+            padding: 8px;
+            border-radius: var(--border-radius);
+            font-size: 14px;
+        }
+        .detail-item label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 3px;
+            color: var(--primary-dark);
+        }
+        .copy-button {
+            background: var(--info);
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+        .copy-button:hover {
+            background: #0d7ddb;
+        }
+        .example-button {
+            background: var(--secondary);
+            color: var(--primary);
+            border: 1px solid var(--primary);
+            padding: 8px 15px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 14px;
+            margin: 10px 0;
+        }
+        .example-button:hover {
+            background: var(--primary);
+            color: white;
+        }
+        @media (max-width: 768px) {
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+            .argument-details {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
-    <h1>ABA Generator</h1>
-    <!-- Textarea for user input, pre-filled with an example -->
-    <textarea id="input" rows="15" cols="60">
-L: [a,b,c,q,p,r,s,t]
+    <div class="container">
+        <h1>ABA Framework Generator</h1>
+        <div class="card">
+            <h2>Define Your ABA Framework</h2>
+            <p>Enter your ABA framework in the text area below. Use the following format:</p>
+            <div style="background: var(--secondary); padding: 15px; border-radius: var(--border-radius); margin: 15px 0;">
+                <p><strong>L:</strong> [a,b,c,q,p,r,s,t] <small># Language</small></p>
+                <p><strong>A:</strong> [a,b,c] <small># Assumptions</small></p>
+                <p><strong>C(a):</strong> r <small># Contrary of a is r</small></p>
+                <p><strong>[r1]:</strong> p &lt;- q,a <small># Rule: p if q and a</small></p>
+                <p><strong>PREF:</strong> a &gt; b <small># a is preferred over b</small></p>
+            </div>
+            <button class="example-button" onclick="loadExample()">Load Example</button>
+            <textarea id="input" placeholder="Paste your ABA framework here..."></textarea>
+            <button onclick="processInput()">Generate and Analyze Framework</button>
+        </div>
+        <div id="output"></div>
+    </div>
+
+    <script>
+        // Load example input
+        function loadExample() {
+            document.getElementById('input').value =
+`L: [a,b,c,q,p,r,s,t]
 A: [a,b,c]
 C(a): r
 C(b): s
 C(c): t
 [r1]: p <- q,a
-[r2]: q <- 
+[r2]: q <-
 [r3]: r <- b,c
 [r4]: t <- p,c
 [r5]: s <- t
 PREF: a > b
-    </textarea>
-    <!-- Button to trigger processing -->
-    <button onclick="processInput()">Generate and Convert ABA Framework</button>
-    <!-- Output area -->
-    <div id="output"></div>
-    <script>
-        /**
-         * Sends the input to the server, processes the result, and displays it.
-         */
-        async function processInput() {
-            const input = document.getElementById('input').value;
-            const response = await fetch('/process', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ input: input })
-            });
-            const result = await response.json();
-            displayResult(result);
+`;
         }
 
-        /**
-         * Formats and displays the result in the UI.
-         * Shows original, non-circular, and atomic frameworks if available.
-         */
+        // Copy to clipboard
+        function copyToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            alert('Copied to clipboard!');
+        }
+
+        // Format rules for display
+        function formatRules(rules) {
+            let html = '<div class="result-grid">';
+            for (const [id, [head, body]] of Object.entries(rules)) {
+                html += `
+                    <div class="result-card">
+                        <h4>Rule ${id}</h4>
+                        <p><strong>Head:</strong> ${head}</p>
+                        <p><strong>Body:</strong> ${body.length ? body.join(', ') : 'None (fact)'}</p>
+                    </div>
+                `;
+            }
+            html += '</div>';
+            return html;
+        }
+
+        // Format arguments for display
+        function formatArguments(arguments) {
+            let html = '<div class="result-grid">';
+            arguments.forEach(arg => {
+                html += `
+                    <div class="argument-item">
+                        <h4>Argument ${arg.id}</h4>
+                        <div class="argument-details">
+                            <div class="detail-item">
+                                <label>Claim</label>
+                                <div>${arg.claim}</div>
+                            </div>
+                            <div class="detail-item">
+                                <label>Assumptions</label>
+                                <div>${arg.assumptions.join(', ')}</div>
+                            </div>
+                            <div class="detail-item">
+                                <label>Rules Used</label>
+                                <div>${arg.rules.join(', ')}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            return html;
+        }
+
+        // Format attacks for display
+        function formatAttacks(attacks) {
+            let html = '<div class="result-grid">';
+            attacks.forEach(attack => {
+                html += `
+                    <div class="attack-item ${attack.type}">
+                        <div>
+                            <strong>${attack.attacker}</strong> attacks <strong>${attack.attacked}</strong>
+                        </div>
+                        <div class="attack-type ${attack.type}">
+                            ${attack.type} attack
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            return html;
+        }
+
+        // Format preferences for display
+        function formatPreferences(preferences) {
+            if (preferences.length === 0) return '<p>No preferences defined.</p>';
+            let html = '<div class="result-card"><h3>Preference Relations</h3><ul>';
+            preferences.forEach(([higher, lower]) => {
+                html += `<li><strong>${higher}</strong> is preferred over <strong>${lower}</strong></li>`;
+            });
+            html += '</ul></div>';
+            return html;
+        }
+
+        // Display results in a user-friendly way
         function displayResult(data) {
             const output = document.getElementById('output');
-            let html = '<div class="section"><h2>Original Framework</h2>';
-            // Display original framework
-            html += `
-                <h3>Language: ${data.original.language.join(', ')}</h3>
-                <h3>Assumptions: ${data.original.assumptions.join(', ')}</h3>
-                <h3>Contraries:</h3>
-                <pre>${JSON.stringify(data.original.contraries, null, 2)}</pre>
-                <h3>Rules:</h3>
-                <pre>${JSON.stringify(data.original.rules, null, 2)}</pre>
-                <h3>Preferences:</h3>
-                <pre>${JSON.stringify(data.original.preferences, null, 2)}</pre>
-                <h3>Arguments:</h3>
-                <pre>${JSON.stringify(data.original.arguments, null, 2)}</pre>
-                <h3>Attacks:</h3>
-                <pre>${JSON.stringify(data.original.attacks, null, 2)}</pre>
+            let html = `
+                <div class="section">
+                    <h2>Original Framework</h2>
+                    <div class="tab">
+                        <button class="tablinks active" onclick="openTab(event, 'original-overview')">Overview</button>
+                        <button class="tablinks" onclick="openTab(event, 'original-rules')">Rules</button>
+                        <button class="tablinks" onclick="openTab(event, 'original-arguments')">Arguments</button>
+                        <button class="tablinks" onclick="openTab(event, 'original-attacks')">Attacks</button>
+                        <button class="tablinks" onclick="openTab(event, 'original-json')">JSON</button>
+                    </div>
+
+                    <div id="original-overview" class="tabcontent active">
+                        <div class="result-grid">
+                            <div class="result-card">
+                                <h3>Language</h3>
+                                <p>${data.original.language.join(', ')}</p>
+                                <button class="copy-button" onclick="copyToClipboard('${data.original.language.join(', ')}')">Copy</button>
+                            </div>
+                            <div class="result-card">
+                                <h3>Assumptions</h3>
+                                <p>${data.original.assumptions.join(', ')}</p>
+                                <button class="copy-button" onclick="copyToClipboard('${data.original.assumptions.join(', ')}')">Copy</button>
+                            </div>
+                            <div class="result-card">
+                                <h3>Contraries</h3>
+                                <pre>${JSON.stringify(data.original.contraries, null, 2)}</pre>
+                                <button class="copy-button" onclick="copyToClipboard('${JSON.stringify(data.original.contraries, null, 2)}')">Copy</button>
+                            </div>
+                            <div class="result-card">
+                                <h3>Preferences</h3>
+                                ${formatPreferences(data.original.preferences)}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="original-rules" class="tabcontent">
+                        <h3>Rules</h3>
+                        ${formatRules(data.original.rules)}
+                    </div>
+
+                    <div id="original-arguments" class="tabcontent">
+                        <h3>Arguments</h3>
+                        ${formatArguments(data.original.arguments)}
+                    </div>
+
+                    <div id="original-attacks" class="tabcontent">
+                        <h3>Attacks</h3>
+                        ${formatAttacks(data.original.attacks)}
+                    </div>
+
+                    <div id="original-json" class="tabcontent">
+                        <h3>Raw JSON</h3>
+                        <pre>${JSON.stringify(data.original, null, 2)}</pre>
+                        <button class="copy-button" onclick="copyToClipboard('${JSON.stringify(data.original, null, 2)}')">Copy JSON</button>
+                    </div>
+                </div>
             `;
-            html += '</div>';
-            // Display non-circular framework if available
+
+            // Add non-circular section if present
             if ('non_circular' in data) {
-                html += '<div class="section"><h2>Non-circular Framework</h2>';
                 html += `
-                    <h3>Language: ${data.non_circular.language.join(', ')}</h3>
-                    <h3>Assumptions: ${data.non_circular.assumptions.join(', ')}</h3>
-                    <h3>Contraries:</h3>
-                    <pre>${JSON.stringify(data.non_circular.contraries, null, 2)}</pre>
-                    <h3>Rules:</h3>
-                    <pre>${JSON.stringify(data.non_circular.rules, null, 2)}</pre>
-                    <h3>Preferences:</h3>
-                    <pre>${JSON.stringify(data.non_circular.preferences, null, 2)}</pre>
-                    <h3>Arguments:</h3>
-                    <pre>${JSON.stringify(data.non_circular.arguments, null, 2)}</pre>
-                    <h3>Attacks:</h3>
-                    <pre>${JSON.stringify(data.non_circular.attacks, null, 2)}</pre>
+                    <div class="section">
+                        <h2>Non-Circular Framework</h2>
+                        <div class="tab">
+                            <button class="tablinks active" onclick="openTab(event, 'noncircular-overview')">Overview</button>
+                            <button class="tablinks" onclick="openTab(event, 'noncircular-rules')">Rules</button>
+                            <button class="tablinks" onclick="openTab(event, 'noncircular-arguments')">Arguments</button>
+                            <button class="tablinks" onclick="openTab(event, 'noncircular-attacks')">Attacks</button>
+                            <button class="tablinks" onclick="openTab(event, 'noncircular-json')">JSON</button>
+                        </div>
+
+                        <div id="noncircular-overview" class="tabcontent active">
+                            <div class="result-grid">
+                                <div class="result-card">
+                                    <h3>Language</h3>
+                                    <p>${data.non_circular.language.join(', ')}</p>
+                                    <button class="copy-button" onclick="copyToClipboard('${data.non_circular.language.join(', ')}')">Copy</button>
+                                </div>
+                                <div class="result-card">
+                                    <h3>Assumptions</h3>
+                                    <p>${data.non_circular.assumptions.join(', ')}</p>
+                                    <button class="copy-button" onclick="copyToClipboard('${data.non_circular.assumptions.join(', ')}')">Copy</button>
+                                </div>
+                                <div class="result-card">
+                                    <h3>Contraries</h3>
+                                    <pre>${JSON.stringify(data.non_circular.contraries, null, 2)}</pre>
+                                    <button class="copy-button" onclick="copyToClipboard('${JSON.stringify(data.non_circular.contraries, null, 2)}')">Copy</button>
+                                </div>
+                                <div class="result-card">
+                                    <h3>Preferences</h3>
+                                    ${formatPreferences(data.non_circular.preferences)}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="noncircular-rules" class="tabcontent">
+                            <h3>Rules</h3>
+                            ${formatRules(data.non_circular.rules)}
+                        </div>
+
+                        <div id="noncircular-arguments" class="tabcontent">
+                            <h3>Arguments</h3>
+                            ${formatArguments(data.non_circular.arguments)}
+                        </div>
+
+                        <div id="noncircular-attacks" class="tabcontent">
+                            <h3>Attacks</h3>
+                            ${formatAttacks(data.non_circular.attacks)}
+                        </div>
+
+                        <div id="noncircular-json" class="tabcontent">
+                            <h3>Raw JSON</h3>
+                            <pre>${JSON.stringify(data.non_circular, null, 2)}</pre>
+                            <button class="copy-button" onclick="copyToClipboard('${JSON.stringify(data.non_circular, null, 2)}')">Copy JSON</button>
+                        </div>
+                    </div>
                 `;
-                html += '</div>';
             }
-            // Display atomic framework if available
+
+            // Add atomic section if present
             if ('atomic' in data) {
-                html += '<div class="section"><h2>Atomic Framework</h2>';
                 html += `
-                    <h3>Language: ${data.atomic.language.join(', ')}</h3>
-                    <h3>Assumptions: ${data.atomic.assumptions.join(', ')}</h3>
-                    <h3>Contraries:</h3>
-                    <pre>${JSON.stringify(data.atomic.contraries, null, 2)}</pre>
-                    <h3>Rules:</h3>
-                    <pre>${JSON.stringify(data.atomic.rules, null, 2)}</pre>
-                    <h3>Preferences:</h3>
-                    <pre>${JSON.stringify(data.atomic.preferences, null, 2)}</pre>
-                    <h3>Arguments:</h3>
-                    <pre>${JSON.stringify(data.atomic.arguments, null, 2)}</pre>
-                    <h3>Attacks:</h3>
-                    <pre>${JSON.stringify(data.atomic.attacks, null, 2)}</pre>
+                    <div class="section">
+                        <h2>Atomic Framework</h2>
+                        <div class="tab">
+                            <button class="tablinks active" onclick="openTab(event, 'atomic-overview')">Overview</button>
+                            <button class="tablinks" onclick="openTab(event, 'atomic-rules')">Rules</button>
+                            <button class="tablinks" onclick="openTab(event, 'atomic-arguments')">Arguments</button>
+                            <button class="tablinks" onclick="openTab(event, 'atomic-attacks')">Attacks</button>
+                            <button class="tablinks" onclick="openTab(event, 'atomic-json')">JSON</button>
+                        </div>
+
+                        <div id="atomic-overview" class="tabcontent active">
+                            <div class="result-grid">
+                                <div class="result-card">
+                                    <h3>Language</h3>
+                                    <p>${data.atomic.language.join(', ')}</p>
+                                    <button class="copy-button" onclick="copyToClipboard('${data.atomic.language.join(', ')}')">Copy</button>
+                                </div>
+                                <div class="result-card">
+                                    <h3>Assumptions</h3>
+                                    <p>${data.atomic.assumptions.join(', ')}</p>
+                                    <button class="copy-button" onclick="copyToClipboard('${data.atomic.assumptions.join(', ')}')">Copy</button>
+                                </div>
+                                <div class="result-card">
+                                    <h3>Contraries</h3>
+                                    <pre>${JSON.stringify(data.atomic.contraries, null, 2)}</pre>
+                                    <button class="copy-button" onclick="copyToClipboard('${JSON.stringify(data.atomic.contraries, null, 2)}')">Copy</button>
+                                </div>
+                                <div class="result-card">
+                                    <h3>Preferences</h3>
+                                    ${formatPreferences(data.atomic.preferences)}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="atomic-rules" class="tabcontent">
+                            <h3>Rules</h3>
+                            ${formatRules(data.atomic.rules)}
+                        </div>
+
+                        <div id="atomic-arguments" class="tabcontent">
+                            <h3>Arguments</h3>
+                            ${formatArguments(data.atomic.arguments)}
+                        </div>
+
+                        <div id="atomic-attacks" class="tabcontent">
+                            <h3>Attacks</h3>
+                            ${formatAttacks(data.atomic.attacks)}
+                        </div>
+
+                        <div id="atomic-json" class="tabcontent">
+                            <h3>Raw JSON</h3>
+                            <pre>${JSON.stringify(data.atomic, null, 2)}</pre>
+                            <button class="copy-button" onclick="copyToClipboard('${JSON.stringify(data.atomic, null, 2)}')">Copy JSON</button>
+                        </div>
+                    </div>
                 `;
-                html += '</div>';
             }
+
             output.innerHTML = html;
+        }
+
+        // Tab functionality
+        function openTab(evt, tabName) {
+            const tabcontent = document.getElementsByClassName("tabcontent");
+            for (let i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].classList.remove("active");
+            }
+            const tablinks = document.getElementsByClassName("tablinks");
+            for (let i = 0; i < tablinks.length; i++) {
+                tablinks[i].classList.remove("active");
+            }
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+
+        // Process input and display results
+        async function processInput() {
+            const input = document.getElementById('input').value;
+            if (!input.trim()) {
+                alert('Please enter an ABA framework.');
+                return;
+            }
+            document.getElementById('output').innerHTML = '<div class="card" style="text-align: center; padding: 40px;"><h3>Processing...</h3><p>Analyzing your ABA framework. Please wait.</p></div>';
+            try {
+                const response = await fetch('/process', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ input: input })
+                });
+                if (!response.ok) {
+                    throw new Error(`Server error: ${response.status}`);
+                }
+                const result = await response.json();
+                displayResult(result);
+            } catch (error) {
+                document.getElementById('output').innerHTML = `
+                    <div class="card" style="text-align: center; padding: 20px; color: var(--danger);">
+                        <h3>Error</h3>
+                        <p>${error.message}</p>
+                        <p>Please check your input and try again.</p>
+                    </div>
+                `;
+                console.error('Error:', error);
+            }
         }
     </script>
 </body>
