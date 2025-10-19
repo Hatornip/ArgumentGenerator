@@ -3,17 +3,36 @@
 <head>
     <title>ABA Generator</title>
     <style>
+        /* Styling for readability and usability */
         body { font-family: Arial, sans-serif; margin: 20px; }
         textarea { width: 100%; height: 200px; }
-        button { padding: 10px 15px; background: #007BFF; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button {
+            padding: 10px 15px;
+            background: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
         button:hover { background: #0056b3; }
         #output { margin-top: 20px; }
-        .section { margin-bottom: 30px; border: 1px solid #ddd; padding: 15px; border-radius: 4px; }
-        pre { background: #f4f4f4; padding: 10px; border-radius: 4px; overflow-x: auto; }
+        .section {
+            margin-bottom: 30px;
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 4px;
+        }
+        pre {
+            background: #f4f4f4;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
     </style>
 </head>
 <body>
     <h1>ABA Generator</h1>
+    <!-- Textarea for user input, pre-filled with an example -->
     <textarea id="input" rows="15" cols="60">
 L: [a,b,c,q,p,r,s,t]
 A: [a,b,c]
@@ -27,9 +46,14 @@ C(c): t
 [r5]: s <- t
 PREF: a > b
     </textarea>
+    <!-- Button to trigger processing -->
     <button onclick="processInput()">Generate and Convert ABA Framework</button>
+    <!-- Output area -->
     <div id="output"></div>
     <script>
+        /**
+         * Sends the input to the server, processes the result, and displays it.
+         */
         async function processInput() {
             const input = document.getElementById('input').value;
             const response = await fetch('/process', {
@@ -43,61 +67,69 @@ PREF: a > b
             displayResult(result);
         }
 
-    function displayResult(data) {
-        const output = document.getElementById('output');
-        let html = '<div class="section"><h2>Original Framework</h2>';
-        html += `
-            <h3>Language: ${data.original.language.join(', ')}</h3>
-            <h3>Assumptions: ${data.original.assumptions.join(', ')}</h3>
-            <h3>Contraries:</h3>
-            <pre>${JSON.stringify(data.original.contraries, null, 2)}</pre>
-            <h3>Rules:</h3>
-            <pre>${JSON.stringify(data.original.rules, null, 2)}</pre>
-            <h3>Preferences:</h3>
-            <pre>${JSON.stringify(data.original.preferences, null, 2)}</pre>
-            <h3>Arguments:</h3>
-            <pre>${JSON.stringify(data.original.arguments, null, 2)}</pre>
-            <h3>Attacks:</h3>
-            <pre>${JSON.stringify(data.original.attacks, null, 2)}</pre>
-        `;
-        html += '</div>';
-        if ('non_circular' in data) {
-            html += '<div class="section"><h2>Non-circular Framework</h2>';
+        /**
+         * Formats and displays the result in the UI.
+         * Shows original, non-circular, and atomic frameworks if available.
+         */
+        function displayResult(data) {
+            const output = document.getElementById('output');
+            let html = '<div class="section"><h2>Original Framework</h2>';
+            // Display original framework
             html += `
-                <h3>Language: ${data.non_circular.language.join(', ')}</h3>
-                <h3>Assumptions: ${data.non_circular.assumptions.join(', ')}</h3>
+                <h3>Language: ${data.original.language.join(', ')}</h3>
+                <h3>Assumptions: ${data.original.assumptions.join(', ')}</h3>
                 <h3>Contraries:</h3>
-                <pre>${JSON.stringify(data.non_circular.contraries, null, 2)}</pre>
+                <pre>${JSON.stringify(data.original.contraries, null, 2)}</pre>
                 <h3>Rules:</h3>
-                <pre>${JSON.stringify(data.non_circular.rules, null, 2)}</pre>
+                <pre>${JSON.stringify(data.original.rules, null, 2)}</pre>
                 <h3>Preferences:</h3>
-                <pre>${JSON.stringify(data.non_circular.preferences, null, 2)}</pre>
+                <pre>${JSON.stringify(data.original.preferences, null, 2)}</pre>
                 <h3>Arguments:</h3>
-                <pre>${JSON.stringify(data.non_circular.arguments, null, 2)}</pre>
+                <pre>${JSON.stringify(data.original.arguments, null, 2)}</pre>
                 <h3>Attacks:</h3>
-                <pre>${JSON.stringify(data.non_circular.attacks, null, 2)}</pre>
+                <pre>${JSON.stringify(data.original.attacks, null, 2)}</pre>
             `;
             html += '</div>';
+            // Display non-circular framework if available
+            if ('non_circular' in data) {
+                html += '<div class="section"><h2>Non-circular Framework</h2>';
+                html += `
+                    <h3>Language: ${data.non_circular.language.join(', ')}</h3>
+                    <h3>Assumptions: ${data.non_circular.assumptions.join(', ')}</h3>
+                    <h3>Contraries:</h3>
+                    <pre>${JSON.stringify(data.non_circular.contraries, null, 2)}</pre>
+                    <h3>Rules:</h3>
+                    <pre>${JSON.stringify(data.non_circular.rules, null, 2)}</pre>
+                    <h3>Preferences:</h3>
+                    <pre>${JSON.stringify(data.non_circular.preferences, null, 2)}</pre>
+                    <h3>Arguments:</h3>
+                    <pre>${JSON.stringify(data.non_circular.arguments, null, 2)}</pre>
+                    <h3>Attacks:</h3>
+                    <pre>${JSON.stringify(data.non_circular.attacks, null, 2)}</pre>
+                `;
+                html += '</div>';
+            }
+            // Display atomic framework if available
+            if ('atomic' in data) {
+                html += '<div class="section"><h2>Atomic Framework</h2>';
+                html += `
+                    <h3>Language: ${data.atomic.language.join(', ')}</h3>
+                    <h3>Assumptions: ${data.atomic.assumptions.join(', ')}</h3>
+                    <h3>Contraries:</h3>
+                    <pre>${JSON.stringify(data.atomic.contraries, null, 2)}</pre>
+                    <h3>Rules:</h3>
+                    <pre>${JSON.stringify(data.atomic.rules, null, 2)}</pre>
+                    <h3>Preferences:</h3>
+                    <pre>${JSON.stringify(data.atomic.preferences, null, 2)}</pre>
+                    <h3>Arguments:</h3>
+                    <pre>${JSON.stringify(data.atomic.arguments, null, 2)}</pre>
+                    <h3>Attacks:</h3>
+                    <pre>${JSON.stringify(data.atomic.attacks, null, 2)}</pre>
+                `;
+                html += '</div>';
+            }
+            output.innerHTML = html;
         }
-        if ('atomic' in data) {
-            html += '<div class="section"><h2>Atomic Framework</h2>';
-            html += `
-                <h3>Language: ${data.atomic.language.join(', ')}</h3>
-                <h3>Assumptions: ${data.atomic.assumptions.join(', ')}</h3>
-                <h3>Contraries:</h3>
-                <pre>${JSON.stringify(data.atomic.contraries, null, 2)}</pre>
-                <h3>Rules:</h3>
-                <pre>${JSON.stringify(data.atomic.rules, null, 2)}</pre>
-                <h3>Preferences:</h3>
-                <pre>${JSON.stringify(data.atomic.preferences, null, 2)}</pre>
-                <h3>Arguments:</h3>
-                <pre>${JSON.stringify(data.atomic.arguments, null, 2)}</pre>
-                <h3>Attacks:</h3>
-                <pre>${JSON.stringify(data.atomic.attacks, null, 2)}</pre>
-            `;
-            html += '</div>';
-        }
-        output.innerHTML = html;
-    }</script>
+    </script>
 </body>
 </html>
